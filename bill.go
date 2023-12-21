@@ -8,6 +8,8 @@ type bill struct {
 	tipPercent float64
 }
 
+// bill{ without a space between the l and { is kind of infuriating, but formatters
+// are too convenient
 func newBill(name string) bill {
 	b := bill{
 		name:       name,
