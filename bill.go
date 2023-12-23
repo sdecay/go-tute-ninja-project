@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
 
 type bill struct {
 	name       string
@@ -22,7 +26,7 @@ func newBill(name string) bill {
 
 // using go's deref shortcut
 func (b *bill) addTip(percentage float64) {
-	b.tipPercent = percentage
+	b.tipPercent = percentage / 100
 }
 
 // not using go's shortcut
@@ -30,7 +34,35 @@ func (b *bill) addItem(item string, price float64) {
 	(*b).items[item] = price
 }
 
-func (b bill) format() string {
+func createBill() bill {
+	reader := bufio.NewReader(os.Stdin) // reader variable is pointer
+
+	name, _ := getInput("What's your name? ", reader)
+
+	b := newBill(name)
+	fmt.Printf("Created bill for %s\n", b.name)
+
+	return b
+}
+
+func (b *bill) save() {
+	data := []byte(b.format())
+
+	if _, err := os.Stat("./bills/" + b.name + ".txt"); err == nil {
+		fmt.Println("Bill exists, overwriting...")
+	}
+
+	// no spaces between + grrrrrr
+	err := os.WriteFile("./bills/"+b.name+".txt", data, 0644)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Bill for %s created...\n", b.name)
+}
+
+func (b *bill) format() string {
 	var formatted string = fmt.Sprintf("%s's Bill Breakdown: \n", b.name)
 	var total float64 = 0
 

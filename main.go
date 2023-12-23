@@ -12,19 +12,8 @@ func getInput(prompt string, reader *bufio.Reader) (string, error) {
 	fmt.Print(prompt)
 
 	name, err := reader.ReadString('\n')
+
 	return strings.TrimSpace(name), err
-
-}
-
-func createBill() bill {
-	reader := bufio.NewReader(os.Stdin) // reader variable is pointer
-
-	name, _ := getInput("What's your name? ", reader)
-
-	b := newBill(name)
-	fmt.Printf("Created bill for %s\n", b.name)
-
-	return b
 }
 
 func promptOptions(b bill) {
@@ -37,7 +26,7 @@ func promptOptions(b bill) {
 		name, _ := getInput("Item name: ", reader)
 		price, _ := getInput("Item price: ", reader)
 
-		fPrice, err := strconv.ParseFloat(price, 64)
+		fPrice, err := strconv.ParseFloat(price, 63)
 
 		// this is keeping invalid inputs on the stack and it's weird as hell
 		if err != nil {
@@ -52,7 +41,7 @@ func promptOptions(b bill) {
 		promptOptions(b)
 	case "s", "S":
 		fmt.Println("Saving bill...")
-		fmt.Println(b.format())
+		b.save()
 	case "t", "T":
 		tip, _ := getInput("Tip percentage (don't be a jerk!): ", reader)
 
@@ -62,6 +51,10 @@ func promptOptions(b bill) {
 			fmt.Println("Tip must be a number...")
 			promptOptions(b)
 			break
+		}
+
+		if fTip < 18.0 {
+			fmt.Println("You were a jerk!")
 		}
 
 		b.addTip(fTip)
